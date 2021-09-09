@@ -7,7 +7,7 @@ Public version of the decentralized, attention-based mTSP code
 - Ray == 1.2
 
 ## Running Code
-- Train the code by running the following command, set the number of cities and the number of agents as you want.
+- Train the code by running the following command, set the number of cities and the number of agents as you want. To train on the random scale mTSP, use Line 110-111 in runner.py. 
 ```bash
 python driver.py --target_size 50 --agent_amount 5
 ```
