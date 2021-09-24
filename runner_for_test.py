@@ -8,9 +8,8 @@ from env import Env
 cfg = config()
 
 
-#@ray.remote(num_gpus= 4 / cfg.meta_agent_amount, num_cpus=1) # use this for training and sampling test
 class TestRunner(object):
-    def __init__(self, metaAgentID, cfg, decode_type='sampling'):
+    def __init__(self, metaAgentID, cfg, decode_type='sampling', plot=False):
         self.ID = metaAgentID
 
         self.decode_type = decode_type
@@ -21,6 +20,8 @@ class TestRunner(object):
         self.local_target_encoder_gradient = []
         self.agent_amount = cfg.agent_amount
 
+        self.plot = plot
+
     def run(self, env):
         return self.model(env,self.agent_amount)
 
@@ -30,8 +31,15 @@ class TestRunner(object):
     def sample(self, env):
         with torch.no_grad():
             route_set, _, _, max_length, _ = self.run(env)
-        #return max_length,route_set # use this code for plot
-        return max_length
+        if self.plot:
+            return max_length,route_set # use this code for plot
+        else:
+            return max_length
+
+
+@ray.remote(num_gpus= cfg.number_of_gpu / cfg.meta_agent_amount, num_cpus=1) # use this for training and sampling test
+class RayTestRunner(TestRunner):
+    pass
 
 
 if __name__ == '__main__':

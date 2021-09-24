@@ -20,6 +20,7 @@ def config(args=None):
     parser.add_argument('--max_grad_norm', type=float, default=1.0, help="clip the gradient l2 norm")
     parser.add_argument('--agent_amount',type=int,default=5,help="agent amount")
     parser.add_argument('--meta_agent_amount', type=int, default=8, help="meta agent amount")
+    parser.add_argument('--number_of_gpu', default=4, help="number of GPUs")
 
     # other
     parser.add_argument('--log_size',default=512,help='every 256 step save the model')
@@ -32,7 +33,7 @@ def config(args=None):
     parser.add_argument('--strategy', default='greedy', help='whether greedy or sampling')
     parser.add_argument('--seed', default=1023, help='seed for test')
 
-    cfg = parser.parse_args(args)
+    cfg = parser.parse_args(args=[])
 
     return cfg
 

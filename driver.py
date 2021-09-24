@@ -12,8 +12,7 @@ from env import Env
 from model import Model
 from config import config
 from runner import Runner
-from runner_for_test import TestRunner
-from pytorch_lamb import Lamb
+from runner_for_test import RayTestRunner
 
 ray.init()
 cfg = config()
@@ -34,9 +33,7 @@ def main(cfg):
 
     lr_decay = optim.lr_scheduler.StepLR(optimizer, step_size=256, gamma=0.96)
 
-    meta_agent_list_rl = [Runner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
-    meta_agent_list_il = [Runner.remote(metaAgentID=i, cfg=cfg,imitation=True) for i in range(0)]
-    meta_agent_list = meta_agent_list_rl + meta_agent_list_il
+    meta_agent_list = [Runner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
 
     # info for tensorboard
     average_loss = 0
@@ -156,7 +153,7 @@ def main(cfg):
 
                 # test the baseline model on the new test set
                 if baseline_value is None:
-                    test_agent_list = [TestRunner.remote(metaAgentID=i, cfg=cfg, decode_type='greedy') for i in
+                    test_agent_list = [RayTestRunner.remote(metaAgentID=i, cfg=cfg, decode_type='greedy') for i in
                                        range(cfg.meta_agent_amount)]
                     update_local_network_job_list = []
                     for _, test_agent in enumerate(test_agent_list):
@@ -176,7 +173,7 @@ def main(cfg):
                         ray.kill(a)
 
                 # test the current model's performance
-                test_agent_list = [TestRunner.remote(metaAgentID=i, cfg=cfg, decode_type='greedy') for i in
+                test_agent_list = [RayTestRunner.remote(metaAgentID=i, cfg=cfg, decode_type='greedy') for i in
                                    range(cfg.meta_agent_amount)]
                 update_local_network_job_list = []
                 for _, test_agent in enumerate(test_agent_list):
@@ -199,9 +196,7 @@ def main(cfg):
                     ray.kill(a)
                                
                 time.sleep(5)
-                meta_agent_list_rl = [Runner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
-                meta_agent_list_il = [Runner.remote(metaAgentID=i, cfg=cfg,imitation=True) for i in range(0)]
-                meta_agent_list = meta_agent_list_rl + meta_agent_list_il
+                meta_agent_list = [Runner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
 
                 for i, meta_agent in enumerate(meta_agent_list):
                     update_local_network_job_list.append(meta_agent.set_model_weights.remote(global_weights))

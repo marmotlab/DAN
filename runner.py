@@ -5,12 +5,11 @@ import ray
 from config import config
 from model import Model
 from env import Env
-from ortools_routes import ortools_routes
 
 cfg = config()
 
 
-@ray.remote(num_gpus= 4/cfg.meta_agent_amount,num_cpus=1)
+@ray.remote(num_gpus= cfg.number_of_gpu/cfg.meta_agent_amount,num_cpus=1)
 class Runner(object):
     def __init__(self, metaAgentID, cfg, imitation=False, decode_type='sampling'):
         self.ID = metaAgentID

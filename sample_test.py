@@ -6,11 +6,11 @@ from env import Env
 
 from model import Model
 from config import config
-from runner_for_test import TestRunner
+from runner_for_test import TestRunner,RayTestRunner
 
 ray.init()
 cfg = config()
-cfg.model_path = 'model_am'
+#cfg.model_path = 'model_am'
 
 test_size = 500
 sample_size = 64
@@ -21,7 +21,7 @@ def main(cfg):
     global_model = Model(cfg)
     global_model.to(device)
 
-    meta_agent_list = [TestRunner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
+    meta_agent_list = [RayTestRunner.remote(metaAgentID=i, cfg=cfg) for i in range(cfg.meta_agent_amount)]
 
     checkpoint = torch.load(cfg.model_path + '/model_states.pth')
     global_step = checkpoint['step']

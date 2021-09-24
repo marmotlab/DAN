@@ -13,6 +13,7 @@ model_path = cfg.model_path
 device = cfg.device
 decode_type = cfg.strategy
 
+
 def show(target, routes, max_length):
     target = target.squeeze(0).cpu()
     print('max_length:{:.3f}'.format(max_length.item()))
@@ -34,7 +35,7 @@ def show(target, routes, max_length):
 
 if __name__ == '__main__':
     env = Env(cfg, cfg.seed)
-    runner = TestRunner(metaAgentID=0, cfg=cfg, decode_type=decode_type)
+    runner = TestRunner(metaAgentID=0, cfg=cfg, decode_type=decode_type, plot=True)
 
     checkpoint = torch.load(model_path + '/model_states.pth')
     runner.model.load_state_dict(checkpoint['model'])
